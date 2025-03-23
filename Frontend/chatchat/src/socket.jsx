@@ -4,7 +4,6 @@ import { io } from 'socket.io-client';
 let backend_url = import.meta.env.VITE_APP_SERVER_URL;
 
 export const socket = io(backend_url, {
-  transports: ["polling"],
   autoConnect: false,
   reconnection: true,
   reconnectionAttempts: 5,
