@@ -8,6 +8,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const messageRoutes = require("./routes/messages");
 const groupRoutes = require("./routes/groups");
+const uploadRoutes = require("./routes/upload");
 const socketLogic = require("./sockets");
 const multer = require("multer");
 
@@ -28,8 +29,9 @@ app.use(
 app.use("/auth", authRoutes);
 app.use("/messages", messageRoutes);
 app.use("/groups", groupRoutes);
+app.use("/upload", uploadRoutes);
 
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
 
 // Real-Time Communication
 const server = http.createServer(app);
@@ -55,14 +57,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ success: false, message: 'No file uploaded' });
-  }
 
-  const fileUrl = `http://localhost:4000/uploads/${req.file.filename}`;
-  res.json({ success: true, fileUrl });
-});
+// app.post('/upload', upload.single('file'), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ success: false, message: 'No file uploaded' });
+//   }
+
+//   const fileUrl = `http://localhost:4000/uploads/${req.file.filename}`;
+//   res.json({ success: true, fileUrl });
+// });
 
 const PORT = 4000;
 server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
