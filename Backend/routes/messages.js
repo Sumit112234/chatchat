@@ -12,14 +12,14 @@ router.get("/:room", authenticate, async (req, res) => {
 });
 
 // File Upload
-const storage = multer.diskStorage({
-  destination: "./uploads",
-  filename: (req, file, cb) => cb(null, `${Date.now()}_${file.originalname}`),
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//   destination: "./uploads",
+//   filename: (req, file, cb) => cb(null, `${Date.now()}_${file.originalname}`),
+// });
+// const upload = multer({ storage });
 
-router.post("/upload", authenticate, upload.single("file"), (req, res) => {
-  res.json({ filePath: `/uploads/${req.file.filename}` });
-});
+// router.post("/upload", authenticate, upload.single("file"), (req, res) => {
+//   res.json({ filePath: `/uploads/${req.file.filename}` });
+// });
 
 module.exports = router;

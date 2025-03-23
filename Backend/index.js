@@ -48,14 +48,14 @@ app.get('/',(req,res)=>{
     working : "Sahi h"
   })
 })
-const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
+// const storage = multer.diskStorage({
+//   destination: './uploads/',
+//   filename: (req, file, cb) => {
+//     cb(null, `${Date.now()}-${file.originalname}`);
+//   }
+// });
 
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 
 // app.post('/upload', upload.single('file'), (req, res) => {
