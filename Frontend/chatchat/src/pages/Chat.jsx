@@ -5,7 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { socket } from '../socket';
 import AudioPlayer from '../components/AudioPlayer';
 
+let backend_url = import.meta.env.VITE_APP_SERVER_URL;
+
 const Chat = ({ user, connected }) => {
+
+  
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [conversations, setConversations] = useState([]);
@@ -195,7 +199,7 @@ const Chat = ({ user, connected }) => {
   
     try {
       // Send file to backend
-      const response = await fetch('http://localhost:4000/upload', {
+      const response = await fetch(backend_url + 'upload', {
         method: 'POST',
         body: formData
       });
@@ -297,7 +301,7 @@ const Chat = ({ user, connected }) => {
           formData.append("file", audioBlob, `recording_${Date.now()}.webm`);
   
           try {
-            const response = await fetch("http://localhost:4000/upload", {
+            const response = await fetch(backend_url + "upload", {
               method: "POST",
               body: formData,
             });
