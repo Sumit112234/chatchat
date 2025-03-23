@@ -11,12 +11,14 @@ const groupRoutes = require("./routes/groups");
 const uploadRoutes = require("./routes/upload");
 const socketLogic = require("./sockets");
 const multer = require("multer");
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: process.env.FRONTEND_URL, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -37,7 +39,7 @@ app.use("/upload", uploadRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
   },
 });

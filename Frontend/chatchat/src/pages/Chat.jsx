@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, Menu, Settings, Users, LogOut, MessageCircle, Mic, Image, Video, PauseCircle, X, Download, Share, Trash, ZoomIn } from 'lucide-react';
+import { Send,Loader2,Menu, Settings, Users, LogOut, MessageCircle, Mic, Image, Video, PauseCircle, X, Download, Share, Trash, ZoomIn } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { socket } from '../socket';
 import AudioPlayer from '../components/AudioPlayer';
@@ -20,6 +21,8 @@ const Chat = ({ user, connected }) => {
   const [mediaPreview, setMediaPreview] = useState(null);
   const [typingUsers, setTypingUsers] = useState([]);
   const [zoomedMedia, setZoomedMedia] = useState(null);
+  const [sendBtnLoading, setSendBtnLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -52,6 +55,7 @@ const Chat = ({ user, connected }) => {
     // Socket events for receiving messages
     socket.on('receiveMessage', (message) => {
       if (message.sender.id !== user.id) {
+        console.log("message received : ", message);
         setMessages((prevMessages) => {
           const messageExists = prevMessages.some(msg => msg.id === message.id);
           if (!messageExists) {
@@ -115,9 +119,15 @@ const Chat = ({ user, connected }) => {
     });
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async(e) => {
     e.preventDefault();
     if ((!newMessage.trim() && !mediaPreview) || !connected) return;
+    
+
+    setSendBtnLoading(true)
+
+
+   
 
     const message = {
       id: Date.now(),
@@ -129,16 +139,18 @@ const Chat = ({ user, connected }) => {
 
     // Add media type if present
     if (mediaPreview) {
-      console.log(mediaPreview)
-      message.type = mediaPreview.type.split('/')[0]; // 'image', 'audio', or 'video'
-      message.media = mediaPreview.preview;
+      await  UploadFiles(message);
+      // console.log(mediaPreview)
+      // message.type = mediaPreview.type.split('/')[0]; // 'image', 'audio', or 'video'
+      // message.media = mediaPreview.preview;
     }
 
     // Optimistically add message to state
     setMessages((prevMessages) => [...prevMessages, message]);
-    
+    setSendBtnLoading(false);
     // Emit message to server
     socket.emit('sendMessage', message);
+    console.log("message sended : ", message);
     
     // Reset state
     setNewMessage('');
@@ -186,18 +198,15 @@ const Chat = ({ user, connected }) => {
   //   }
   // };
   
+  const UploadFiles = async(message)=>{
+    if(!file)
+        return; 
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-  
-    const fileType = file.type.split('/')[0]; // 'image', 'audio', or 'video'
-  
-    // Create a FormData object to send the file to the backend
     const formData = new FormData();
     formData.append('file', file);
   
     try {
+        console.log('Uploading file....');
       // Send file to backend
       const response = await fetch(backend_url + 'upload', {
         method: 'POST',
@@ -207,16 +216,47 @@ const Chat = ({ user, connected }) => {
       const data = await response.json();
   
       if (data.success) {
+        setFile(null);
         setMediaPreview({
           type: file.type,
           preview: data.fileUrl, // Store the uploaded file URL
           name: file.name
         });
+        message.type = file.type.split('/')[0]; // 'image', 'audio', or 'video'
+        message.media = data.fileUrl;
       }
     } catch (error) {
       console.error('Error uploading file:', error);
     }
-  };
+    
+
+  }
+
+
+  const handleFileChange = async (e) => {
+    const files = e.target.files[0];
+    
+    if (!files) return;
+
+    setFile(files);
+  
+    const fileType = files.type.split('/')[0]; // 'image', 'audio', or 'video'
+  
+
+    const reader = new FileReader();
+      
+    // show file before sending
+      reader.onload = (event) => {
+        setMediaPreview({
+          type: files.type,
+          preview: event.target.result,
+          name: files.name
+        });
+      };
+      
+      reader.readAsDataURL(files);
+
+ };
   
   const blobToBase64 = (blob) => {
     return new Promise((resolve) => {
@@ -281,7 +321,6 @@ const Chat = ({ user, connected }) => {
   //   }
   // };
 
-
   const handleMicClick = async () => {
     if (!isRecording) {
       try {
@@ -297,26 +336,18 @@ const Chat = ({ user, connected }) => {
   
         mediaRecorderRef.current.onstop = async () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-          const formData = new FormData();
-          formData.append("file", audioBlob, `recording_${Date.now()}.webm`);
+          const audioUrl = URL.createObjectURL(audioBlob);
   
-          try {
-            const response = await fetch(backend_url + "upload", {
-              method: "POST",
-              body: formData,
-            });
+          // Preview before uploading
+          setMediaPreview({
+            type: "audio/webm",
+            preview: audioUrl,
+            name: `Recording_${Date.now()}.webm`,
+          });
   
-            const result = await response.json();
-            if (result.success) {
-              setMediaPreview({
-                type: "audio/webm",
-                preview: result.fileUrl, // Use URL from server
-                name: `Recording_${new Date().toISOString()}`,
-              });
-            }
-          } catch (error) {
-            console.error("Error uploading audio:", error);
-          }
+          // Convert to file format
+          const audioFile = new File([audioBlob], `recording_${Date.now()}.webm`, { type: "audio/webm" });
+          setFile(audioFile); // Store file for upload
   
           // Stop all tracks
           stream.getTracks().forEach((track) => track.stop());
@@ -472,7 +503,7 @@ const handleDownloadMedia = (mediaUrl, filename, type) => {
           
         )}
 
-{        console.log(message)}
+
         
         {message.type === 'audio' && (
           <AudioPlayer message={message}/>
@@ -809,14 +840,18 @@ const handleDownloadMedia = (mediaUrl, filename, type) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              disabled={(!newMessage.trim() && !mediaPreview) || !connected}
-              className={`p-2 rounded-full ${
-                (!newMessage.trim() && !mediaPreview) || !connected
+              disabled={sendBtnLoading || (!newMessage.trim() && !mediaPreview) || !connected}
+              className={`p-2 rounded-full flex items-center justify-center ${
+                sendBtnLoading || (!newMessage.trim() && !mediaPreview) || !connected
                   ? 'bg-blue-400 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700'
               } text-white`}
             >
-              <Send size={20} />
+              {sendBtnLoading ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <Send size={20} />
+              )}
             </motion.button>
           </div>
         </form>
