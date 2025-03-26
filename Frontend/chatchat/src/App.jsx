@@ -7,12 +7,16 @@ import Chat from './pages/Chat';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import { getUser } from './utils/userHandler';
+import { UserContext, useUser } from './context/userContext';
 
 const App = () => {
   const [connected, setConnected] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user , setUser } = useUser();
 
   useEffect(() => {
+
+    // getUser().then((user)=>console.log(user)).catch((e)=>console.log(e));
     // Check for stored auth token
     const token = localStorage.getItem('chat-token');
     if (token) {

@@ -11,21 +11,24 @@ const groupRoutes = require("./routes/groups");
 const uploadRoutes = require("./routes/upload");
 const socketLogic = require("./sockets");
 const multer = require("multer");
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, 
+    origin: [process.env.FRONTEND_URL , 'http://localhost:5173'], 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
 // MongoDB Connection
-// connectDB();
+// 
 
 // Routes
 app.use("/auth", authRoutes);
@@ -39,8 +42,9 @@ app.use("/upload", uploadRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL , 'http://localhost:5173'],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -50,27 +54,12 @@ app.get('/',(req,res)=>{
     working : "Sahi h"
   })
 })
-// const storage = multer.diskStorage({
-//   destination: './uploads/',
-//   filename: (req, file, cb) => {
-//     cb(null, `${Date.now()}-${file.originalname}`);
-//   }
-// });
-
-// const upload = multer({ storage });
-
-
-// app.post('/upload', upload.single('file'), (req, res) => {
-//   if (!req.file) {
-//     return res.status(400).json({ success: false, message: 'No file uploaded' });
-//   }
-
-//   const fileUrl = `http://localhost:4000/uploads/${req.file.filename}`;
-//   res.json({ success: true, fileUrl });
-// });
 
 const PORT = 4000;
-server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+server.listen(PORT, async() => {
+  await connectDB();
+  console.log(`Server running on http://localhost:${PORT}`)
+});
 
 
 

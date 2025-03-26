@@ -5,12 +5,13 @@ import { Send,Loader2,Menu, Settings, Users, LogOut, MessageCircle, Mic, Image, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { socket } from '../socket';
 import AudioPlayer from '../components/AudioPlayer';
+import {useUser} from '../context/userContext.jsx'
 
 let backend_url = import.meta.env.VITE_APP_SERVER_URL;
 
-const Chat = ({ user, connected }) => {
+const Chat = ({  connected }) => {
 
-  
+  const { user, logout } = useUser();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [conversations, setConversations] = useState([]);
@@ -612,7 +613,7 @@ const handleDownloadMedia = (mediaUrl, filename, type) => {
                 <Settings size={20} />
                 <span>Settings</span>
               </Link>
-              <button className="mt-4 flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white">
+              <button onClick={()=>logout()} className="mt-4 flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white">
                 <LogOut size={20} />
                 <span>Sign out</span>
               </button>

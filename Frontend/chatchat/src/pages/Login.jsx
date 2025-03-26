@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+// import { login } from '../utils/userHandler';
+import { useUser } from '../context/userContext';
 
-const Login = ({ setUser }) => {
+const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,6 +13,7 @@ const Login = ({ setUser }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {user,setUser, login} = useUser();
 
   const handleChange = (e) => {
     setFormData({
@@ -26,21 +29,30 @@ const Login = ({ setUser }) => {
 
     try {
       // Make API call to login
-      // const response = await loginUser(formData);
+      const response = await login(formData);
+      console.log(response)
+      navigate('/');
       // localStorage.setItem('chat-token', response.token);
       // setUser(response.user);
       // Mocked for example
-      setTimeout(() => {
-        setUser({ id: Math.floor(Math.random()*100), name: 'Test User', email: formData.email });
-        localStorage.setItem('chat-token', 'mock-token');
-        navigate('/');
-      }, 1000);
+      // setTimeout(() => {
+      //   setUser({ id: Math.floor(Math.random()*100), name: 'Test User', email: formData.email });
+      //   localStorage.setItem('chat-token', 'mock-token');
+      //   // navigate('/');
+      // }, 1000);
     } catch (err) {
       setError('Invalid email or password');
     } finally {
       setLoading(false);
     }
   };
+  
+
+  useEffect(()=>{
+    if(user)
+      navigate('/')
+    
+  },[user])
 
   return (
     <motion.div 
