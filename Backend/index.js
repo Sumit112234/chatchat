@@ -18,11 +18,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(
   cors({
-    origin: "*", 
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
@@ -42,7 +42,7 @@ app.use("/upload", uploadRoutes);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FRONTEND_URL , 'http://localhost:5173'],
+    origin: process.env.FRONTEND_URL ,
     methods: ["GET", "POST"],
     credentials: true,
   },

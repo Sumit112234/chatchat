@@ -137,6 +137,11 @@ router.get("/get-user",authenticate, async (req, res) => {
   
   res.json({ user : req.user });
 });
+router.get("/get-all-users", async (req, res) => {  
+  let users = await User.find({}).select("-password -__v").sort({ createdAt : -1 });
+
+  res.status(200).json({ users });
+});
 
 
 
