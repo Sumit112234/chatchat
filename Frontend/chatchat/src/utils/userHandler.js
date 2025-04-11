@@ -10,6 +10,11 @@ export const getUser = async()=>{
     return res.data;
     
 }
+export const getAllUsers = async()=>{
+    let res = await axios.get(backend_url + "auth/get-all-users")
+    return res.data.users;
+    
+}
 
 
 export const login = async(data)=>{

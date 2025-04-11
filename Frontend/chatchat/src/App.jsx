@@ -9,16 +9,27 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { getUser } from './utils/userHandler';
 import { UserContext, useUser } from './context/userContext';
+import VoiceCallComponent from './pages/VoiceCall';
+
+
+
+// claude , add a calling button to call the user use lucide-react for calling and declining call button and once user call then show this.name user is calling you would you like to answer?
+
+
 
 const App = () => {
   const [connected, setConnected] = useState(false);
   const { user , setUser } = useUser();
 
+  // console.log('hello ji')
+
   useEffect(() => {
 
     // getUser().then((user)=>console.log(user)).catch((e)=>console.log(e));
     // Check for stored auth token
+    console.log("user : ", user)
     const token = localStorage.getItem('chat-token');
+    console.log(token)
     if (token) {
       // Validate token and set user
       validateToken(token);
@@ -68,6 +79,7 @@ const App = () => {
           element={
             <ProtectedRoute user={user}>
               <Chat user={user} connected={connected} />
+              {/* <VoiceCallComponent/> */}
             </ProtectedRoute>
           } 
         />

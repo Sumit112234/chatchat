@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 // import { fetchStudent } from "../utils/api";
 import axios from "axios";
-
+import { socket } from '../socket';
 
 let backend_url = import.meta.env.VITE_APP_SERVER_URL;
 export const UserContext = createContext();
@@ -66,6 +66,12 @@ export const UserProvider = ({ children }) => {
           })
         //   return res.data;
         console.log(res.data);
+        if (socket) {
+
+          console.log("setting usr id in socket : ", { userId : res?.data?.user?._id })
+          socket.emit("registerUser", { userId : res?.data?.user?._id });
+        }
+
       setUser(res?.data?.user);
     };
     getUser();

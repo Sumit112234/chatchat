@@ -32,7 +32,7 @@ const Login = () => {
       const response = await login(formData);
       console.log(response)
       navigate('/');
-      // localStorage.setItem('chat-token', response.token);
+      localStorage.setItem('chat-token', response.token);
       // setUser(response.user);
       // Mocked for example
       // setTimeout(() => {
@@ -50,7 +50,12 @@ const Login = () => {
 
   useEffect(()=>{
     if(user)
-      navigate('/')
+    {
+      setTimeout(() => {
+        navigate('/')
+      }, 1500);
+      
+    }
     
   },[user])
 
