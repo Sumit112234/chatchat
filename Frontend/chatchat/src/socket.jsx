@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 // Initialize socket connection - replace with your server URL
-let backend_url = import.meta.env.VITE_APP_SERVER_URL;
+let backend_url = import.meta.env.VITE_APP_SERVER_SOCKET_URL;
 
 export const socket = io(backend_url, {
   autoConnect: false,
