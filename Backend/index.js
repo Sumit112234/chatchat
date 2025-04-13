@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 // app.use(cors());
-console.log(process.env.FRONTEND_URL)
+// console.log(process.env.FRONTEND_URL)
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -52,7 +52,8 @@ const io = new Server(server, {
 socketLogic(io);
 app.get('/',(req,res)=>{
   res.json({
-    working : "Sahi h"
+    working : "Sahi h",
+    url : process.env.FRONTEND_URL
   })
 })
 
