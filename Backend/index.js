@@ -53,7 +53,7 @@ socketLogic(io);
 app.get('/',(req,res)=>{
   res.json({
     working : "Sahi h",
-    url : process.env.FRONTEND_URL
+  
   })
 })
 
